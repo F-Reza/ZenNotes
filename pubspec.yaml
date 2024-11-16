@@ -11,6 +11,8 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   sqflite:
+  share_plus:
+  intl:
 
 
 dev_dependencies:

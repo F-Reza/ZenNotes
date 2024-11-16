@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../models/note_model.dart';
 
 class NoteCard extends StatelessWidget {
@@ -11,12 +12,11 @@ class NoteCard extends StatelessWidget {
     // Use the color or fallback to blue if null
     final Color noteColor = note.color != null ? Color(note.color!) : Colors.grey;
 
-    return Container(
-      width: double.infinity, // This ensures the card takes full available width
-      padding: const EdgeInsets.all(2),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width / 2, // This ensures the card takes full available width
       child: Card(
         color: noteColor, // Use the determined color
-        elevation: 5,
+        elevation: 4,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -26,6 +26,10 @@ class NoteCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
+                DateFormat('dd/MM/yyyy - hh:mm a').format(note.date),  // Format date and time
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              Text(
                 note.title,
                 style: const TextStyle(
                   fontSize: 18,
@@ -33,7 +37,7 @@ class NoteCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              Text(
+              /*Text(
                 note.content,
                 style: const TextStyle(
                   fontSize: 14,
@@ -41,8 +45,21 @@ class NoteCard extends StatelessWidget {
                 ),
                 softWrap: true,
                 maxLines: 7,
-                overflow: TextOverflow.ellipsis,
-              ),
+                overflow: TextOverflow.clip,
+              ),*/
+              Flexible(
+                child: Text(
+                  note.content,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white,
+                  ),
+                  softWrap: true,
+                  maxLines: 7,
+                  overflow: TextOverflow.clip,
+                ),
+              )
+
             ],
           ),
         ),

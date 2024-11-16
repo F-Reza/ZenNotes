@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/note_model.dart';
 import '../db/notes_database.dart';
 
@@ -74,6 +75,43 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
         actions: [
           if (widget.note != null)
             IconButton(
+              icon: const Icon(Icons.copy),
+              onPressed: () async {
+                // Create a new note with the same title, content, and color but without an ID
+                final newNote = Note(
+                  title: widget.note!.title,
+                  content: widget.note!.content,
+                  date: DateTime.now(),
+                  color: widget.note!.color, // Copy color as well
+                );
+
+                // Save the copied note to the database
+                await NotesDatabase.instance.create(newNote);
+
+                // Optionally show a confirmation message or navigate back
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Note copied successfully')),
+                );
+              },
+            ),
+
+          if (widget.note != null)
+            IconButton(
+              icon: const Icon(Icons.share),
+              onPressed: () async {
+                // Share the note content
+                final String noteContent = 'Title: ${widget.note!.title}\n\n${widget.note!.content}';
+                await Share.share(noteContent);
+
+                // Show confirmation
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Note shared successfully')),
+                );
+              },
+            ),
+
+          if (widget.note != null)
+            IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () async {
                 await NotesDatabase.instance.delete(widget.note!.id!);
@@ -82,84 +120,86 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
             ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _titleController,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-                decoration: const InputDecoration(
-                  filled: true,
-                  border: InputBorder.none,
-                  labelText: 'Title',
-                ),
-                validator: (value) =>
-                value == null || value.isEmpty ? 'Title is required' : null,
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _contentController,
-                keyboardType: TextInputType.multiline,
-                decoration: const InputDecoration(
-                  labelText: 'Content',
-                  alignLabelWithHint: true,
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.grey,
-                      width: 0.3,
-                    ),
+      body: SingleChildScrollView( // Wrap the whole body in a SingleChildScrollView
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                TextFormField(
+                  controller: _titleController,
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                  decoration: const InputDecoration(
+                    filled: true,
+                    border: InputBorder.none,
+                    labelText: 'Title',
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(width: 1, color: Colors.black),
-                  ),
+                  validator: (value) =>
+                  value == null || value.isEmpty ? 'Title is required' : null,
                 ),
-                minLines: 20,
-                maxLines: null,
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Content is required'
-                    : null,
-              ),
-              const SizedBox(height: 20),
-              // Row of color selection boxes
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: _colorOptions.map((colorOption) {
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedColor = colorOption['value'];
-                      });
-                    },
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: colorOption['color'],
-                        borderRadius: BorderRadius.circular(5),
-                        border: Border.all(
-                          color: _selectedColor == colorOption['value']
-                              ? Colors.black
-                              : Colors.transparent,
-                          width: 2,
-                        ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _contentController,
+                  keyboardType: TextInputType.multiline,
+                  decoration: const InputDecoration(
+                    labelText: 'Content',
+                    alignLabelWithHint: true,
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.grey,
+                        width: 0.3,
                       ),
                     ),
-                  );
-                }).toList(),
-              ),
-              const Spacer(),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2d38ff),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(width: 1, color: Colors.black),
+                    ),
+                  ),
+                  minLines: 14,
+                  maxLines: null,
+                  validator: (value) =>
+                  value == null || value.isEmpty ? 'Content is required' : null,
                 ),
-                onPressed: _saveNote,
-                child: Text(widget.note == null ? 'Create Note' : 'Save Changes',
-                    style: const TextStyle(color: Colors.white)),
-              ),
-            ],
+                const SizedBox(height: 20),
+                // Row of color selection boxes
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: _colorOptions.map((colorOption) {
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedColor = colorOption['value'];
+                        });
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: colorOption['color'],
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(
+                            color: _selectedColor == colorOption['value']
+                                ? Colors.black
+                                : Colors.transparent,
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 60),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2d38ff),
+                  ),
+                  onPressed: _saveNote,
+                  child: Text(widget.note == null ? 'Create Note' : 'Save Changes',
+                      style: const TextStyle(color: Colors.white)),
+                ),
+              ],
+            ),
           ),
         ),
       ),
