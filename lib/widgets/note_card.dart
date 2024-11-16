@@ -3,26 +3,49 @@ import '../models/note_model.dart';
 
 class NoteCard extends StatelessWidget {
   final Note note;
-  final VoidCallback onTap;
 
-  const NoteCard({
-    super.key,
-    required this.note,
-    required this.onTap,
-  });
+  const NoteCard({super.key, required this.note});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: ListTile(
-        title: Text(note.title),
-        subtitle: Text(
-          note.content,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
+    // Use the color or fallback to blue if null
+    final Color noteColor = note.color != null ? Color(note.color!) : Colors.grey;
+
+    return Container(
+      width: double.infinity, // This ensures the card takes full available width
+      padding: const EdgeInsets.all(2),
+      child: Card(
+        color: noteColor, // Use the determined color
+        elevation: 5,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
-        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(10), // Adjust the inner padding as needed
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                note.title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                note.content,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.white,
+                ),
+                softWrap: true,
+                maxLines: 7,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../models/note_model.dart';
 
 class NoteDetailsScreen extends StatelessWidget {
@@ -16,7 +15,7 @@ class NoteDetailsScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.copy),
             onPressed: () async {
-              await Clipboard.setData(ClipboardData(text: note.content));
+              //await Clipboard.setData(ClipboardData(text: note.content));
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Note content copied to clipboard')),
               );
@@ -34,15 +33,11 @@ class NoteDetailsScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8.0),
-            Text(
-              'Category: ${note.category}',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
             const Divider(),
             Expanded(
               child: SingleChildScrollView(
                 child: Text(
-                  note.content,
+                  'note.content',
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),

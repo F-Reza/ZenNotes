@@ -15,7 +15,17 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
-  final _categoryController = TextEditingController();
+  int? _selectedColor; // Variable to hold selected color
+
+  // Define a list of colors for the rectangular boxes
+  final List<Map<String, dynamic>> _colorOptions = [
+    {'name': 'Red', 'value': Colors.red.value, 'color': Colors.red},
+    {'name': 'Blue', 'value': Colors.blue.value, 'color': Colors.blue},
+    {'name': 'Green', 'value': Colors.green.value, 'color': Colors.green},
+    {'name': 'Yellow', 'value': Colors.yellow.value, 'color': Colors.yellow},
+    {'name': 'Purple', 'value': Colors.purple.value, 'color': Colors.purple},
+    {'name': 'Orange', 'value': Colors.orange.value, 'color': Colors.orange},
+  ];
 
   @override
   void initState() {
@@ -23,7 +33,7 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
     if (widget.note != null) {
       _titleController.text = widget.note!.title;
       _contentController.text = widget.note!.content;
-      _categoryController.text = widget.note!.category;
+      _selectedColor = widget.note!.color; // Set the selected color
     }
   }
 
@@ -31,7 +41,6 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
   void dispose() {
     _titleController.dispose();
     _contentController.dispose();
-    _categoryController.dispose();
     super.dispose();
   }
 
@@ -43,8 +52,8 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
         id: isEditing ? widget.note!.id : null,
         title: _titleController.text,
         content: _contentController.text,
-        category: _categoryController.text,
         date: DateTime.now(),
+        color: _selectedColor, // Save selected color
       );
 
       if (isEditing) {
@@ -81,28 +90,74 @@ class _AddEditNoteScreenState extends State<AddEditNoteScreen> {
             children: [
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                decoration: const InputDecoration(
+                  filled: true,
+                  border: InputBorder.none,
+                  labelText: 'Title',
+                ),
                 validator: (value) =>
                 value == null || value.isEmpty ? 'Title is required' : null,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
               TextFormField(
                 controller: _contentController,
-                decoration: const InputDecoration(labelText: 'Content'),
-                maxLines: 5,
+                keyboardType: TextInputType.multiline,
+                decoration: const InputDecoration(
+                  labelText: 'Content',
+                  alignLabelWithHint: true,
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.grey,
+                      width: 0.3,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(width: 1, color: Colors.black),
+                  ),
+                ),
+                minLines: 20,
+                maxLines: null,
                 validator: (value) => value == null || value.isEmpty
                     ? 'Content is required'
                     : null,
               ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _categoryController,
-                decoration: const InputDecoration(labelText: 'Category'),
+              const SizedBox(height: 20),
+              // Row of color selection boxes
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: _colorOptions.map((colorOption) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedColor = colorOption['value'];
+                      });
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: colorOption['color'],
+                        borderRadius: BorderRadius.circular(5),
+                        border: Border.all(
+                          color: _selectedColor == colorOption['value']
+                              ? Colors.black
+                              : Colors.transparent,
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
               const Spacer(),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2d38ff),
+                ),
                 onPressed: _saveNote,
-                child: Text(widget.note == null ? 'Create Note' : 'Save Changes'),
+                child: Text(widget.note == null ? 'Create Note' : 'Save Changes',
+                    style: const TextStyle(color: Colors.white)),
               ),
             ],
           ),

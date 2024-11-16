@@ -87,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
           decoration: const InputDecoration(
             hintText: 'Search notes...',
             border: InputBorder.none,
+            hintStyle: TextStyle(color: Colors.grey),
           ),
           style: const TextStyle(color: Colors.white, fontSize: 18),
         )
@@ -102,30 +103,28 @@ class _HomeScreenState extends State<HomeScreen> {
           ? const Center(
         child: Text('No notes found.'),
       )
-          : ListView.builder(
+          : GridView.builder(
+        padding: const EdgeInsets.all(8),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2, // Two columns in the grid
+          crossAxisSpacing: 0,
+          mainAxisSpacing: 4,
+          childAspectRatio: 1, // Square-shaped grid items
+        ),
         itemCount: _filteredNotes.length,
         itemBuilder: (context, index) {
           final note = _filteredNotes[index];
-          return Dismissible(
-            key: Key(note.id.toString()),
-            background: Container(
-              color: Colors.red,
-              alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: const Icon(Icons.delete, color: Colors.white),
-            ),
-            direction: DismissDirection.startToEnd,
-            onDismissed: (_) => _deleteNote(note.id!),
+          return GestureDetector(
+            onTap: () => _navigateToAddEditNoteScreen(note: note),
             child: NoteCard(
               note: note,
-              onTap: () => _navigateToAddEditNoteScreen(note: note),
             ),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF2d38ff),
-        child: const Icon(Icons.add,color: Colors.white,),
+        child: const Icon(Icons.add, color: Colors.white),
         onPressed: () => _navigateToAddEditNoteScreen(),
       ),
     );
